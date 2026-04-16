@@ -1,0 +1,37 @@
+{
+  "name": "restaurant-booking",
+  "version": "1.0.0",
+  "description": "Restaurant booking backend built with clean architecture principles.",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "start": "node dist/server.js",
+    "test": "npm run build && node --test dist/tests/**/*.test.js",
+    "test:coverage": "npm run build && node --test --experimental-test-coverage dist/tests/**/*.test.js"
+  },
+  "keywords": [
+    "booking",
+    "restaurant",
+    "backend",
+    "clean-architecture"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.4.1",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.6.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^6.0.2"
+  }
+}
