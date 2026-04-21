@@ -1,4 +1,4 @@
-import { AuthTokenPayload, TokenService } from "../../application/services/TokenService";
+import { AuthTokenPayload, TokenService } from "../../services/TokenService";
 
 export class FakeTokenService implements TokenService {
   sign(payload: AuthTokenPayload): string {

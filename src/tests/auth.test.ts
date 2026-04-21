@@ -1,23 +1,22 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { RegisterUser } from "../application/use-cases/RegisterUser";
-import { LoginUser } from "../application/use-cases/LoginUser";
-import { InMemoryUserRepository } from "../infrastructure/repositories/InMemoryUserRepository";
+import { InMemoryUserRepository } from "../repositories/InMemoryUserRepository";
+import { AuthService } from "../services/AuthService";
 import { PlainTextPasswordHasher } from "./helpers/PlainTextPasswordHasher";
 import { FakeTokenService } from "./helpers/FakeTokenService";
 import { FakeLogger } from "./helpers/FakeLogger";
-import { AppError } from "../application/errors/AppError";
+import { AppError } from "../utils/AppError";
 
 test("registers a new customer and returns a token", async () => {
   const repository = new InMemoryUserRepository();
-  const registerUser = new RegisterUser(
+  const authService = new AuthService(
     repository,
     new PlainTextPasswordHasher(),
     new FakeTokenService(),
     new FakeLogger()
   );
 
-  const result = await registerUser.execute({
+  const result = await authService.register({
     name: "Nirma",
     email: "nirma@example.com",
     password: "secret12"
@@ -30,21 +29,21 @@ test("registers a new customer and returns a token", async () => {
 
 test("prevents duplicate registration", async () => {
   const repository = new InMemoryUserRepository();
-  const registerUser = new RegisterUser(
+  const authService = new AuthService(
     repository,
     new PlainTextPasswordHasher(),
     new FakeTokenService(),
     new FakeLogger()
   );
 
-  await registerUser.execute({
+  await authService.register({
     name: "First User",
     email: "duplicate@example.com",
     password: "secret12"
   });
 
   await assert.rejects(
-    registerUser.execute({
+    authService.register({
       name: "Second User",
       email: "duplicate@example.com",
       password: "secret12"
@@ -55,7 +54,7 @@ test("prevents duplicate registration", async () => {
 
 test("validates registration input", async () => {
   const repository = new InMemoryUserRepository();
-  const registerUser = new RegisterUser(
+  const authService = new AuthService(
     repository,
     new PlainTextPasswordHasher(),
     new FakeTokenService(),
@@ -63,7 +62,7 @@ test("validates registration input", async () => {
   );
 
   await assert.rejects(
-    registerUser.execute({
+    authService.register({
       name: "",
       email: "",
       password: ""
@@ -72,7 +71,7 @@ test("validates registration input", async () => {
   );
 
   await assert.rejects(
-    registerUser.execute({
+    authService.register({
       name: "Short Password",
       email: "short@example.com",
       password: "123"
@@ -84,28 +83,21 @@ test("validates registration input", async () => {
 test("logs in a registered user", async () => {
   const repository = new InMemoryUserRepository();
   const passwordHasher = new PlainTextPasswordHasher();
-  const registerUser = new RegisterUser(
+  const authService = new AuthService(
     repository,
     passwordHasher,
     new FakeTokenService(),
     new FakeLogger()
   );
 
-  await registerUser.execute({
+  await authService.register({
     name: "Admin",
     email: "admin@example.com",
     password: "secret12",
     role: "admin"
   });
 
-  const loginUser = new LoginUser(
-    repository,
-    passwordHasher,
-    new FakeTokenService(),
-    new FakeLogger()
-  );
-
-  const result = await loginUser.execute({
+  const result = await authService.login({
     email: "admin@example.com",
     password: "secret12"
   });
@@ -117,28 +109,21 @@ test("logs in a registered user", async () => {
 test("rejects invalid login credentials", async () => {
   const repository = new InMemoryUserRepository();
   const passwordHasher = new PlainTextPasswordHasher();
-  const registerUser = new RegisterUser(
+  const authService = new AuthService(
     repository,
     passwordHasher,
     new FakeTokenService(),
     new FakeLogger()
   );
 
-  await registerUser.execute({
+  await authService.register({
     name: "User",
     email: "user@example.com",
     password: "secret12"
   });
 
-  const loginUser = new LoginUser(
-    repository,
-    passwordHasher,
-    new FakeTokenService(),
-    new FakeLogger()
-  );
-
   await assert.rejects(
-    loginUser.execute({
+    authService.login({
       email: "user@example.com",
       password: "wrong-password"
     }),
@@ -148,7 +133,7 @@ test("rejects invalid login credentials", async () => {
 
 test("requires login input and rejects unknown users", async () => {
   const repository = new InMemoryUserRepository();
-  const loginUser = new LoginUser(
+  const authService = new AuthService(
     repository,
     new PlainTextPasswordHasher(),
     new FakeTokenService(),
@@ -156,7 +141,7 @@ test("requires login input and rejects unknown users", async () => {
   );
 
   await assert.rejects(
-    loginUser.execute({
+    authService.login({
       email: "",
       password: ""
     }),
@@ -164,7 +149,7 @@ test("requires login input and rejects unknown users", async () => {
   );
 
   await assert.rejects(
-    loginUser.execute({
+    authService.login({
       email: "missing@example.com",
       password: "secret12"
     }),

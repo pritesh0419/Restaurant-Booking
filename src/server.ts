@@ -1,6 +1,6 @@
 import { app } from "./app";
+import { connectToDatabase } from "./config/database";
 import { env } from "./config/env";
-import { connectToDatabase } from "./infrastructure/database/mongoose/connect";
 
 async function start() {
   if (!env.useInMemoryRepositories && env.mongoUri) {

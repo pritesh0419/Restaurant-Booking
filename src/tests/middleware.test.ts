@@ -1,10 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { authMiddleware } from "../presentation/middleware/authMiddleware";
-import { requireRole } from "../presentation/middleware/requireRole";
+import { authMiddleware } from "../middleware/authMiddleware";
+import { requireRole } from "../middleware/requireRole";
 import { FakeTokenService } from "./helpers/FakeTokenService";
-import { AuthenticatedRequest } from "../presentation/http/types";
-import { AppError } from "../application/errors/AppError";
+import { AppError } from "../utils/AppError";
+import { AuthenticatedRequest } from "../utils/types";
 
 test("auth middleware attaches a user for a valid token", async () => {
   const middleware = authMiddleware(new FakeTokenService());

@@ -1,4 +1,4 @@
-import { Logger } from "../../application/services/Logger";
+import { Logger } from "../../services/Logger";
 
 export class FakeLogger implements Logger {
   info(): void {}
